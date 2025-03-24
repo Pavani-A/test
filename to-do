@@ -1,0 +1,73 @@
+import unittest
+
+# To-Do List Class
+class ToDoList:
+    def __init__(self):
+        self.tasks = []  # List to store tasks
+
+    def add_task(self, task):
+        """Adds a new task to the list."""
+        self.tasks.append({"task": task, "completed": False})
+        return f'Task "{task}" added.'
+
+    def remove_task(self, task):
+        """Removes a task from the list."""
+        for t in self.tasks:
+            if t["task"] == task:
+                self.tasks.remove(t)
+                return f'Task "{task}" removed.'
+        return "Task not found."
+
+    def mark_complete(self, task):
+        """Marks a task as complete."""
+        for t in self.tasks:
+            if t["task"] == task:
+                t["completed"] = True
+                return f'Task "{task}" marked as complete.'
+        return "Task not found."
+
+    def view_tasks(self):
+        """Returns a list of tasks."""
+        return self.tasks if self.tasks else []  # ✅ Always returns a list
+
+# Unit Tests
+class TestToDoList(unittest.TestCase):
+
+    def setUp(self):
+        """Runs before each test to create a fresh To-Do List object."""
+        self.todo = ToDoList()
+
+    def test_add_task(self):
+        self.assertEqual(self.todo.add_task("Buy groceries"), 'Task "Buy groceries" added.')
+        self.assertIn({"task": "Buy groceries", "completed": False}, self.todo.view_tasks())
+
+    def test_remove_task(self):
+        self.todo.add_task("Clean room")
+        self.todo.remove_task("Clean room")
+
+        # Extract only task names from the list
+        task_names = [task["task"] for task in self.todo.view_tasks()]
+
+        # Check that "Clean room" is not in the task list
+        self.assertNotIn("Clean room", task_names)
+
+    def test_mark_complete(self):
+        self.todo.add_task("Do homework")
+        self.assertEqual(self.todo.mark_complete("Do homework"), 'Task "Do homework" marked as complete.')
+        
+        # Extract tasks and check for completed status
+        completed_tasks = [task for task in self.todo.view_tasks() if task["task"] == "Do homework"]
+        self.assertTrue(completed_tasks[0]["completed"])  # Ensure it's marked complete
+
+    def test_remove_non_existent_task(self):
+        self.assertEqual(self.todo.remove_task("Nonexistent"), "Task not found.")
+
+    def test_mark_non_existent_task(self):
+        self.assertEqual(self.todo.mark_complete("Nonexistent"), "Task not found.")
+
+    def test_view_empty_list(self):
+        self.assertEqual(self.todo.view_tasks(), [])  # ✅ Expect an empty list, not a string
+
+# Run tests when script is executed
+if __name__ == "__main__":
+    unittest.main()
